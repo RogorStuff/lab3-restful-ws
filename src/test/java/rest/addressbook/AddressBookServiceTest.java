@@ -79,6 +79,9 @@ public class AddressBookServiceTest {
     Response response = client.target("http://localhost:8282/contacts")
       .request(MediaType.APPLICATION_JSON)
       .post(Entity.entity(juan, MediaType.APPLICATION_JSON));
+      
+    AddressBook originalAB = response.readEntity(AddressBook.class);
+    assertEquals(0, originalAB.getPersonList().size());
 
     assertEquals(201, response.getStatus());
     assertEquals(juanURI, response.getLocation());
@@ -103,13 +106,12 @@ public class AddressBookServiceTest {
     // complete the test to ensure that it is not safe and not idempotent
     //////////////////////////////////////////////////////////////////////
 
-    //Test that it isn't safe (adding the same person twice changes status)
+    //Test that it isn't safe (adding a person changes the status)
     
     Response response2 = client.target("http://localhost:8282/contacts")
-      .request(MediaType.APPLICATION_JSON)
-      .post(Entity.entity(juan, MediaType.APPLICATION_JSON));
+      .request().get();
     assertEquals(200, response2.getStatus());
-    assertNotEquals(response2.getLocation(), juanURI);
+    assertNotEquals(originalAB.getPersonList().size(),response2.readEntity(AddressBook.class).getPersonList().size());
 /*
     //Test that it isn't idempotent
     Response response3 = client.target("http://localhost:8282/contacts")
