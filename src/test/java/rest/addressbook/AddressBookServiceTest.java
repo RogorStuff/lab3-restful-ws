@@ -104,34 +104,17 @@ public class AddressBookServiceTest {
     //////////////////////////////////////////////////////////////////////
 
     //Test that it isn't safe (adding a person changes the status)
-    /*
-    Response response2 = client.target("http://localhost:8282/contacts")
-      .request().get();
-    assertEquals(200, response2.getStatus());
-    //assertNotEquals(originalAB.getPersonList().size(),response2.readEntity(AddressBook.class).getPersonList().size());
-
-    //Test that it isn't idempotent
-    Response response3 = client.target("http://localhost:8282/contacts")
-      .request(MediaType.APPLICATION_JSON)
-      .post(Entity.entity(juan, MediaType.APPLICATION_JSON));
-    assertEquals(200, response.getStatus());
-    assertNotEquals(juanURI, response.getLocation());
-    assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
-
-    Person juanUpdated2 = response.readEntity(Person.class);
-    assertEquals(juanUpdated.getName(), juanUpdated2.getName());
-    assertNotEquals(1, juanUpdated2.getId());
-    assertNotEquals(juanURI, juanUpdated2.getHref());*/
+    
     Response response2 = client.target("http://localhost:8282/contacts")
             .request(MediaType.APPLICATION_JSON)
             .post(Entity.entity(juan, MediaType.APPLICATION_JSON));
-    assertEquals(201, response2.getStatus());
+    assertEquals(200, response2.getStatus());
     //it changes the uri
     //Expected :http://localhost:8282/contacts/person/2
     //Actual   :http://localhost:8282/contacts/person/1
     assertNotEquals(response2.getLocation(), juanURI);
 
-    //Not idempotent, the result is not the same by adding the same person
+    //Test that it isn't idempotent
     Person juan2 = response2.readEntity(Person.class);
     assertNotEquals(juan,juan2);
     assertEquals(juan.getName(),juan2.getName());
