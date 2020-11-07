@@ -109,9 +109,6 @@ public class AddressBookServiceTest {
             .request(MediaType.APPLICATION_JSON)
             .post(Entity.entity(juan, MediaType.APPLICATION_JSON));
     assertEquals(200, response2.getStatus());
-    //it changes the uri
-    //Expected :http://localhost:8282/contacts/person/2
-    //Actual   :http://localhost:8282/contacts/person/1
     assertNotEquals(response2.getLocation(), juanURI);
 
     //Test that it isn't idempotent
@@ -120,7 +117,7 @@ public class AddressBookServiceTest {
     assertEquals(juan.getName(),juan2.getName());
     assertNotEquals(1, juan2.getId());
     assertNotEquals(juanURI, juan2.getHref());
-
+    
     response2 = client.target("http://localhost:8282/contacts").request().get();
     assertEquals(200, response2.getStatus());
     assertNotEquals(1, response2.readEntity(AddressBook.class).getPersonList().size());
