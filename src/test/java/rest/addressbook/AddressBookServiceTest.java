@@ -108,9 +108,7 @@ public class AddressBookServiceTest {
     Response response2 = client.target("http://localhost:8282/contacts")
             .request(MediaType.APPLICATION_JSON)
             .post(Entity.entity(juan, MediaType.APPLICATION_JSON));
-    assertEquals(200, response2.getStatus());
-    //Expected :http://localhost:8282/contacts/person/2
-    //Actual   :http://localhost:8282/contacts/person/1
+    assertEquals(201, response2.getStatus());
     assertNotEquals(response2.getLocation(), juanURI);
 
     //Test that it isn't idempotent
