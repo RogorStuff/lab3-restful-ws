@@ -332,6 +332,18 @@ public class AddressBookServiceTest {
     // complete the test to ensure that it is idempotent but not safe
     //////////////////////////////////////////////////////////////////////
 
+    //Test that the function isn't safe (status changes)
+    Response response2 = client
+      .target("http://localhost:8282/contacts/person/2").request()
+      .delete();
+    assertEquals(404, response2.getStatus());
+
+    //Test that the user stays deleted
+    Response response3 = client.target("http://localhost:8282/contacts")
+      .request().get();
+    assertEquals(200, response3.getStatus());
+    assertEquals(1, response3.readEntity(AddressBook.class).getPersonList().size());
+
   }
 
   @Test
