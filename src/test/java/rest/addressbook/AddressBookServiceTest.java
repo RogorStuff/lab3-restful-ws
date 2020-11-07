@@ -79,9 +79,6 @@ public class AddressBookServiceTest {
     Response response = client.target("http://localhost:8282/contacts")
       .request(MediaType.APPLICATION_JSON)
       .post(Entity.entity(juan, MediaType.APPLICATION_JSON));
-      
-    //AddressBook originalAB = response.readEntity(AddressBook.class);
-    //assertEquals(0, originalAB.getPersonList().size());
 
     assertEquals(201, response.getStatus());
     assertEquals(juanURI, response.getLocation());
@@ -107,7 +104,7 @@ public class AddressBookServiceTest {
     //////////////////////////////////////////////////////////////////////
 
     //Test that it isn't safe (adding a person changes the status)
-    
+    /*
     Response response2 = client.target("http://localhost:8282/contacts")
       .request().get();
     assertEquals(200, response2.getStatus());
@@ -124,7 +121,26 @@ public class AddressBookServiceTest {
     Person juanUpdated2 = response.readEntity(Person.class);
     assertEquals(juanUpdated.getName(), juanUpdated2.getName());
     assertNotEquals(1, juanUpdated2.getId());
-    assertNotEquals(juanURI, juanUpdated2.getHref());
+    assertNotEquals(juanURI, juanUpdated2.getHref());*/
+    Response response2 = client.target("http://localhost:8282/contacts")
+            .request(MediaType.APPLICATION_JSON)
+            .post(Entity.entity(juan, MediaType.APPLICATION_JSON));
+    assertEquals(201, response2.getStatus());
+    //it changes the uri
+    //Expected :http://localhost:8282/contacts/person/2
+    //Actual   :http://localhost:8282/contacts/person/1
+    assertNotEquals(response2.getLocation(), juanURI);
+
+    //Not idempotent, the result is not the same by adding the same person
+    Person juan2 = response2.readEntity(Person.class);
+    assertNotEquals(juan,juan2);
+    assertEquals(juan.getName(),juan2.getName());
+    assertNotEquals(1, juan2.getId());
+    assertNotEquals(juanURI, juan2.getHref());
+
+    response2 = client.target("http://localhost:8282/contacts").request().get();
+    assertEquals(200, response2.getStatus());
+    assertNotEquals(1, response2.readEntity(AddressBook.class).getPersonList().size());
   }
 
   @Test
