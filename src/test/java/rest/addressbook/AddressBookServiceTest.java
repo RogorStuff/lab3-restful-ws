@@ -104,13 +104,13 @@ public class AddressBookServiceTest {
     //////////////////////////////////////////////////////////////////////
 
     //Test that it isn't safe (adding the same person twice changes status)
-    /*
+    
     Response response2 = client.target("http://localhost:8282/contacts")
       .request(MediaType.APPLICATION_JSON)
       .post(Entity.entity(juan, MediaType.APPLICATION_JSON));
     assertEquals(200, response2.getStatus());
     assertNotEquals(response2.getLocation(), juanURI);
-
+/*
     //Test that it isn't idempotent
     Response response3 = client.target("http://localhost:8282/contacts")
       .request(MediaType.APPLICATION_JSON)
