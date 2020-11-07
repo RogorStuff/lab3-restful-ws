@@ -52,6 +52,14 @@ public class AddressBookServiceTest {
     // Verify that GET /contacts is well implemented by the service, i.e
     // complete the test to ensure that it is safe and idempotent
     //////////////////////////////////////////////////////////////////////
+
+    //Test that it's safe (server state doesn't change)
+    Response response2 = client.target("http://localhost:8282/contacts")
+      .request().get();
+    AddressBook AB = response2.readEntity(AddressBook.class);
+    assertEquals(0, AB.getPersonList().size());
+    //Test that the result is the same in both requests (idempotent)
+    assertEquals(response.getStatus(), response2.getStatus());
   }
 
   @Test
@@ -93,6 +101,26 @@ public class AddressBookServiceTest {
     // Verify that POST /contacts is well implemented by the service, i.e
     // complete the test to ensure that it is not safe and not idempotent
     //////////////////////////////////////////////////////////////////////
+
+    //Test that it isn't safe (adding the same person twice changes status)
+    Response response2 = client.target("http://localhost:8282/contacts")
+      .request(MediaType.APPLICATION_JSON)
+      .post(Entity.entity(juan, MediaType.APPLICATION_JSON));
+    assertEquals(200, response2.getStatus());
+    assertNotEquals(response2.getLocation(), juanURI);
+
+    //Test that it isn't idempotent
+    Response response3 = client.target("http://localhost:8282/contacts")
+      .request(MediaType.APPLICATION_JSON)
+      .post(Entity.entity(juan, MediaType.APPLICATION_JSON));
+    assertEquals(200, response.getStatus());
+    assertNotEquals(juanURI, response.getLocation());
+    assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
+    
+    Person juanupdated2 = response.readEntity(Person.class);
+    assertEquals(juanUpdated.getName(), juanUpdated2.getName());
+    assertNotEquals(1, juanUpdated2.getId());
+    assertNotEquals(juanURI, juanUpdated2.getHref());
 
   }
 
@@ -148,7 +176,6 @@ public class AddressBookServiceTest {
     // Verify that GET /contacts/person/3 is well implemented by the service, i.e
     // complete the test to ensure that it is safe and idempotent
     //////////////////////////////////////////////////////////////////////
-
   }
 
   @Test
