@@ -116,7 +116,7 @@ public class AddressBookServiceTest {
     assertEquals(200, response.getStatus());
     assertNotEquals(juanURI, response.getLocation());
     assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
-    
+
     Person juanupdated2 = response.readEntity(Person.class);
     assertEquals(juanUpdated.getName(), juanUpdated2.getName());
     assertNotEquals(1, juanUpdated2.getId());
@@ -176,6 +176,15 @@ public class AddressBookServiceTest {
     // Verify that GET /contacts/person/3 is well implemented by the service, i.e
     // complete the test to ensure that it is safe and idempotent
     //////////////////////////////////////////////////////////////////////
+
+    //Test that status doesn't change and that the new user exists
+    Response response2 = client.target("http://localhost:8282/contacts/person/3")
+            .request(MediaType.APPLICATION_JSON).get();
+    Person Maria2 = response2.readEntity(Person.class);
+    assertEquals(mariaUpdated.getName(), Maria2.getName());
+    assertEquals(mariaUpdated.getId(), Maria2.getId());
+    assertEquals(mariaUpdated.getHref(), Maria2.getHref());
+    assertEquals(response.getStatus(), response2.getStatus());
   }
 
   @Test
@@ -208,6 +217,21 @@ public class AddressBookServiceTest {
     // complete the test to ensure that it is safe and idempotent
     //////////////////////////////////////////////////////////////////////
 
+    //Test that the status didn't change (safe)
+    Response response2 = client.target("http://localhost:8282/contacts")
+      .request(MediaType.APPLICATION_JSON).get();
+    
+    assertEquals(200, response2.getStatus());
+    assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
+    assertEquals(response.getStatus(), response2.getStatus());
+
+    //Test that the AddressBook is the same (idempotent)
+    AddressBook AB2 = response2.readEntity(AddressBook.class);
+    assertEquals(2, AB2.getPersonList().size());
+    assertEquals(juan.getName(), AB2.getPersonList()
+      .get(1).getName());
+    assertEquals(salvador.getName(), AB2.getPersonList()
+      .get(0).getName());
   }
 
   @Test
