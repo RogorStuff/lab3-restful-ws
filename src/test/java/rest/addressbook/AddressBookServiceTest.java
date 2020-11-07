@@ -118,7 +118,7 @@ public class AddressBookServiceTest {
     assertNotEquals(juanURI, response.getLocation());
     assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
 
-    Person juanupdated2 = response.readEntity(Person.class);
+    Person juanUpdated2 = response.readEntity(Person.class);
     assertEquals(juanUpdated.getName(), juanUpdated2.getName());
     assertNotEquals(1, juanUpdated2.getId());
     assertNotEquals(juanURI, juanUpdated2.getHref());
@@ -285,6 +285,18 @@ public class AddressBookServiceTest {
     // Verify that PUT /contacts/person/2 is well implemented by the service, i.e
     // complete the test to ensure that it is idempotent but not safe
     //////////////////////////////////////////////////////////////////////
+
+    //Test that the person has changed (safe)
+    Response responseIdem = client.target("http://localhost:8282/contacts/person/2")
+      .request(MediaType.APPLICATION_JSON)
+      .put(Entity.entity(maria, MediaType.APPLICATION_JSON));
+    Person mariaUpdated = responseIdem.readEntity(Person.class);
+    assertEquals(mariaUpdated.getName(), juanUpdated.getName());
+    assertEquals(2, mariaUpdated.getId());
+    assertEquals(juanURI, mariaUpdated.getHref());
+
+    //Test that the result stays the same (idempotent)
+    assertEquals(200, responseIdem.getStatus());
 
   }
 
