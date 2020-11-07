@@ -111,8 +111,8 @@ public class AddressBookServiceTest {
     Response response2 = client.target("http://localhost:8282/contacts")
       .request().get();
     assertEquals(200, response2.getStatus());
-    assertNotEquals(originalAB.getPersonList().size(),response2.readEntity(AddressBook.class).getPersonList().size());
-/*
+    //assertNotEquals(originalAB.getPersonList().size(),response2.readEntity(AddressBook.class).getPersonList().size());
+
     //Test that it isn't idempotent
     Response response3 = client.target("http://localhost:8282/contacts")
       .request(MediaType.APPLICATION_JSON)
@@ -125,7 +125,6 @@ public class AddressBookServiceTest {
     assertEquals(juanUpdated.getName(), juanUpdated2.getName());
     assertNotEquals(1, juanUpdated2.getId());
     assertNotEquals(juanURI, juanUpdated2.getHref());
-*/
   }
 
   @Test
